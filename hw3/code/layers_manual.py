@@ -1,4 +1,5 @@
 import math
+from unittest import result
 
 import layers_keras
 import numpy as np
@@ -45,4 +46,29 @@ class Conv2D(layers_keras.Conv2D):
         ## Iterate and apply convolution operator to each image
 
         ## PLEASE RETURN A TENSOR using tf.convert_to_tensor(your_array, dtype=tf.float32)
-        return None
+        output_height = (h_in - fh + 2 * ph)/sh + 1
+        output_width = (w_in - fw + 2 * pw)/sw + 1
+        outputs_shape = (bn, int(output_height), int(output_width), c_out)
+        print(self.kernel.shape)
+        print(outputs_shape)
+
+        if self.padding == "SAME":
+            paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
+            inputs = tf.pad(inputs, paddings, "CONSTANT")
+
+        outputs = np.zeros(outputs_shape)
+        for b in range(bn):
+            for k in range(c_out):
+                for h in range(outputs_shape[0]):
+                    for w in range(outputs_shape[1]):
+                        result = 0
+                        for c in range(c_in):
+                            kernel_flat = tf.reshape(self.kernel[:, :, c, k],self.kernel_size)
+                            inputs_flat = tf.reshape(inputs[b, :, :, c],(h_in, w_in))
+                            inputs_sliced = tf.slice(inputs_flat, [h*sh, w*sw], [fh, fw])
+                            result += tf.reduce_sum(inputs_sliced*kernel_flat)
+                        outputs[b, h, w, k] = result
+                    
+        outputs = tf.convert_to_tensor(outputs, dtype=tf.float32)
+        
+        return outputs + self.bias

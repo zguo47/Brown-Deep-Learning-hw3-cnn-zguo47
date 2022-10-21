@@ -41,7 +41,8 @@ def get_default_CNN_model(
 
     ## TODO 1: Augment the input data (feel free to experiment)
     ## https://www.tensorflow.org/guide/keras/preprocessing_layers
-    augment_fn = tf.keras.Sequential([])
+    augment_fn = tf.keras.Sequential([tf.keras.layers.RandomFlip(),
+    tf.keras.layers.RandomRotation(0.1)])
 
     ## TODO 2: Make sure your first Conv2D is Conv2D_manual (after you've
     ## implemented it), has stride 2, 2, and goes up to low channel count
@@ -50,21 +51,37 @@ def get_default_CNN_model(
     ## Dropout, tf.keras.layers.Dense, tf.keras.layers.MaxPool2d, and
     ## tf.keras.layers.Flatten
     model = CustomSequential(
-        [],
+        [Conv2D_manual(16, (3,3), strides=(2,2), activation='leaky_relu', padding='same', dtype = 'float32'),
+        tf.keras.layers.MaxPool2D((2,2), 2),
+        BatchNormalization(dtype = 'float32'), 
+        Conv2D(64, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
+        BatchNormalization(dtype = 'float32'), 
+        Conv2D(128, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
+        tf.keras.layers.MaxPool2D((2,2), 2),
+        BatchNormalization(dtype = 'float32'), 
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(128, activation='leaky_relu', dtype = 'float32'),
+        Dropout(0.1, dtype = 'float32'), 
+        tf.keras.layers.Dense(64, activation='sigmoid', dtype = 'float32'),
+        Dropout(0.1, dtype = 'float32'), 
+        tf.keras.layers.Dense(10, activation='softmax', dtype = 'float32')],
         ## Take a look at the constructor for CustomSequential to see if you
         ## might need to pass in the necessary preparation functions...
+        input_prep_fn = input_prep_fn,
+        output_prep_fn = output_prep_fn,
+        augment_fn = augment_fn
     )
 
     ## TODO 3: Compile your model using your choice of optimizer
     model.compile(
-        optimizer=None,  ## feel free to change
+        optimizer=tf.keras.optimizers.Adam(0.0008),  ## feel free to change
         loss="categorical_crossentropy",  ## do not change loss/metrics
         metrics=["categorical_accuracy"],
     )
 
     ## TODO 4: Pick an appropriate number of epochs and batch size to use for training
     ## your model. Note that the autograder will time out after 10 minutes.
-    return SimpleNamespace(model=model, epochs=0, batch_size=0)
+    return SimpleNamespace(model=model, epochs=20, batch_size=250)
 
 
 ###############################################################################################

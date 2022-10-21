@@ -1,3 +1,4 @@
+import math
 from typing import Iterable
 
 import tensorflow as tf
@@ -123,7 +124,10 @@ class Conv2D(tf.keras.layers.Layer):
         ## Refer to the __call__ method at
         ## https://www.tensorflow.org/api_docs/python/tf/keras/initializers/Initializer
         ## for the arguments you can pass in
-        return None
+        self.kernel = self.kernel_initializer((self.kernel_size[0], self.kernel_size[1], input_shape[-1], self.filters), dtype = 'float32')
+        if self.use_bias:
+            self.bias = self.bias_initializer((self.filters,), dtype = 'float32')
+        return 
 
     def call(self, inputs, training=False):
         ## Constrain your kernel and bias (refer to docstring for what this means)
@@ -131,10 +135,25 @@ class Conv2D(tf.keras.layers.Layer):
         self.bias   = self.bias_constraint(self.bias)
 
         ## TODO 2: Perform convolution using tf.nn.convolution and bias and activation if necessary
+        inputs = tf.cast(inputs, tf.float32)
+        outputs = tf.nn.convolution(
+            input = inputs, 
+            filters = self.kernel,
+            strides = self.strides,
+            padding = self.padding
+        )
+
+        if self.use_bias:
+            outputs += self.bias
+        outputs = self.activation(outputs)
 
         ## TODO 3: use self.add_loss on the result of applying your regularizers
         ## to tell tensorflow that the regularizers are going to affect the loss
-        return None
+        self.add_loss(self.kernel_regularizer(self.kernel))
+        self.add_loss(self.bias_regularizer(self.bias))
+        self.add_loss(self.activity_regularizer(self.activation))
+        
+        return outputs
 
 
 ################################################################################################
@@ -232,7 +251,14 @@ class BatchNormalization(tf.keras.layers.Layer):
         ## Make sure you understand the purpose self.axis is playing.
 
         ## TODO 2: Initialize components as tf.Variables; specify trainable status as appropriate
-        return None
+        if self.center == True:
+            self.beta = tf.Variable(self.beta_initializer(input_shape), trainable=True)
+        if self.scale == True:
+            self.gamma = tf.Variable(self.gamma_initializer(input_shape), trainable=True)
+            
+        self.moving_mean = tf.Variable(self.moving_mean_initializer(input_shape), trainable=False)
+        self.moving_variance = tf.Variable(self.moving_variance_initializer(input_shape), trainable=False)
+        return 
 
     def call(self, inputs, training=False):
         ## Apply the constraints. An example of using a deserialized function
@@ -246,10 +272,22 @@ class BatchNormalization(tf.keras.layers.Layer):
         ## tf.nn.moments computes the batch average and batch variance for you
         if training:
             bmu, bvar = tf.nn.moments(inputs, range(len(inputs.shape) - 1))
+            self.moving_mean = self.moving_mean * self.momentum + bmu * (1-self.momentum)
+            self.moving_variance = self.moving_variance * self.momentum + bvar * (1-self.momentum)
+
+        if training:
+            outputs = (inputs - bmu)/(bvar + self.epsilon)**0.5
+            outputs = self.gamma * outputs + self.beta
+        else:
+            outputs = (inputs - self.moving_mean)/(self.moving_variance + self.epsilon)**0.5
+            outputs = self.gamma * outputs + self.beta
 
         ## TODO 4: use self.add_loss on the result of applying your regularizers
         ## to tell tensorflow that the regularizers are going to affect the loss
-        return None
+        self.add_loss(self.beta_regularizer(self.beta))
+        self.add_loss(self.gamma_regularizer(self.gamma))
+
+        return outputs
 
 
 ################################################################################################
@@ -276,4 +314,11 @@ class Dropout(tf.keras.layers.Layer):
 
     def call(self, inputs, training=False):
         ## TODO: Implement forward pass for dropout
-        return None
+        if training:
+            if self.noise_shape == None:
+                self.noise_shape = inputs.shape
+            mask = tf.random.uniform(shape=self.noise_shape, minval=0, maxval=1, seed=self.seed) >= self.rate 
+            outputs = tf.cast(mask, dtype='float32') * inputs / (1.0 - self.rate)
+        else:
+            outputs = inputs
+        return outputs
