@@ -48,19 +48,30 @@ class Conv2D(layers_keras.Conv2D):
         ## PLEASE RETURN A TENSOR using tf.convert_to_tensor(your_array, dtype=tf.float32)
         h_in += 2*ph
         w_in += 2*pw
-        output_height = (h_in - fh)//sh+1
-        output_width = (w_in - fw)//sw+1
-        outputs_shape = (bn, output_height, output_width, c_out)
+        # output_height = (h_in - fh)//sh+1
+        # output_width = (w_in - fw)//sw+1
+        # outputs_shape = (bn, output_height, output_width, c_out)
+        if self.padding == "VALID":
+            output_height = math.ceil((h_in - fh + 1)/sh)
+            output_width = math.ceil((w_in - fw + 1)/sw)
+            outputs_shape = (bn, int(output_height), int(output_width), c_out)
 
         if self.padding == "SAME":
+            output_height = math.ceil(h_in/sh)
+            output_width = math.ceil(w_in/sw)
+            outputs_shape = (bn, int(output_height), int(output_width), c_out)
             paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
             inputs = tf.pad(inputs, paddings, "CONSTANT")
+
+        # if self.padding == "SAME":
+        #     paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
+        #     inputs = tf.pad(inputs, paddings, "CONSTANT")
 
         outputs = np.zeros(outputs_shape)
         for b in range(bn):
             for k in range(c_out):
-                for h in range(outputs_shape[0]):
-                    for w in range(outputs_shape[1]):
+                for h in range(outputs_shape[1]):
+                    for w in range(outputs_shape[2]):
                         result = 0
                         for c in range(c_in):
                             kernel_flat = tf.reshape(self.kernel[:, :, c, k],self.kernel_size)

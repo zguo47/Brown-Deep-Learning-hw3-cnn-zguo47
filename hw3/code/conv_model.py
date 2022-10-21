@@ -51,7 +51,7 @@ def get_default_CNN_model(
     ## Dropout, tf.keras.layers.Dense, tf.keras.layers.MaxPool2d, and
     ## tf.keras.layers.Flatten
     model = CustomSequential(
-        [Conv2D(16, (3,3), strides=(2,2), activation='leaky_relu', padding='same', dtype = 'float32'),
+        [Conv2D_manual(16, (3,3), strides=(2,2), activation='leaky_relu', padding='same', dtype = 'float32'),
         tf.keras.layers.MaxPool2D((2,2), 2),
         BatchNormalization(dtype = 'float32'), 
         Conv2D(64, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
