@@ -52,8 +52,8 @@ class Conv2D(layers_keras.Conv2D):
         # output_width = (w_in - fw)//sw+1
         # outputs_shape = (bn, output_height, output_width, c_out)
         if self.padding == "VALID":
-            output_height = math.ceil((h_in - fh + 1)/sh)
-            output_width = math.ceil((w_in - fw + 1)/sw)
+            output_height = (h_in - fh)//sh+1
+            output_width = (w_in - fw)//sw+1
             outputs_shape = (bn, int(output_height), int(output_width), c_out)
 
         if self.padding == "SAME":
