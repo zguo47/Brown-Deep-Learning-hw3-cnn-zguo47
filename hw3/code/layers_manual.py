@@ -46,15 +46,13 @@ class Conv2D(layers_keras.Conv2D):
         ## Iterate and apply convolution operator to each image
 
         ## PLEASE RETURN A TENSOR using tf.convert_to_tensor(your_array, dtype=tf.float32)
-        if self.padding == "VALID":
-            output_height = math.ceil((h_in - fh + 1)/sh)
-            output_width = math.ceil((w_in - fw + 1)/sw)
-            outputs_shape = (bn, int(output_height), int(output_width), c_out)
+        h_in += 2*ph
+        w_in += 2*pw
+        output_height = (h_in - fh)//sh+1
+        output_width = (w_in - fw)//sw+1
+        outputs_shape = (bn, output_height, output_width, c_out)
 
         if self.padding == "SAME":
-            output_height = math.ceil(h_in/sh)
-            output_width = math.ceil(w_in/sw)
-            outputs_shape = (bn, int(output_height), int(output_width), c_out)
             paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
             inputs = tf.pad(inputs, paddings, "CONSTANT")
 
