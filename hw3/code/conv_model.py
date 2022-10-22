@@ -60,9 +60,9 @@ def get_default_CNN_model(
         tf.keras.layers.MaxPool2D((2,2), 2),
         BatchNormalization(dtype = 'float32'), 
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='leaky_relu', dtype = 'float32'),
+        tf.keras.layers.Dense(200, activation='leaky_relu', dtype = 'float32'),
         Dropout(0.1, dtype = 'float32'), 
-        tf.keras.layers.Dense(64, activation='sigmoid', dtype = 'float32'),
+        tf.keras.layers.Dense(100, activation='sigmoid', dtype = 'float32'),
         Dropout(0.1, dtype = 'float32'), 
         tf.keras.layers.Dense(10, activation='softmax', dtype = 'float32')],
         ## Take a look at the constructor for CustomSequential to see if you
@@ -81,7 +81,7 @@ def get_default_CNN_model(
 
     ## TODO 4: Pick an appropriate number of epochs and batch size to use for training
     ## your model. Note that the autograder will time out after 10 minutes.
-    return SimpleNamespace(model=model, epochs=20, batch_size=250)
+    return SimpleNamespace(model=model, epochs=25, batch_size=250)
 
 
 ###############################################################################################
