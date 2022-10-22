@@ -36,13 +36,13 @@ class Conv2D(layers_keras.Conv2D):
             pad_along_width = max(fw - (w_in % sw), 0)
 
         # Cleaning padding input.
-        # if self.padding == "SAME":
-        #     ph = (fh - 1) // 2
-        #     pw = (fw - 1) // 2
-        # elif self.padding == "VALID":
-        #     ph, pw = 0, 0
-        # else:
-        #     raise AssertionError(f"Illegal padding type {self.padding}")
+        if self.padding == "SAME":
+            ph = (fh - 1) // 2
+            pw = (fw - 1) // 2
+        elif self.padding == "VALID":
+            ph, pw = 0, 0
+        else:
+            raise AssertionError(f"Illegal padding type {self.padding}")
 
         if self.padding == "SAME":
             ph_top = pad_along_height // 2
@@ -93,13 +93,6 @@ class Conv2D(layers_keras.Conv2D):
         #     paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
         #     inputs = tf.pad(inputs, paddings, "CONSTANT")
 
-        print(outputs_shape)
-        print(inputs.shape)
-        print(c_out)
-        print(c_in)
-        print(output_height)
-        print(output_width)
-
         outputs = np.zeros(outputs_shape)
         for b in range(bn):
             for k in range(c_out):
@@ -114,5 +107,6 @@ class Conv2D(layers_keras.Conv2D):
                         outputs[b, h, w, k] = result
                     
         outputs = tf.convert_to_tensor(outputs + self.bias, dtype=tf.float32)
+        outputs = self.activation(outputs)
         
         return outputs
