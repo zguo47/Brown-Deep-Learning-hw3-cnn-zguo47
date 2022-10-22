@@ -26,12 +26,34 @@ class Conv2D(layers_keras.Conv2D):
         fh, fw = self.kernel_size            ## filter height & width
         sh, sw = self.strides                ## filter stride
 
+        if (h_in % sh == 0):
+            pad_along_height = max(fh - sh, 0)
+        else:
+            pad_along_height = max(fh - (h_in % sh), 0)
+        if (w_in % sw == 0):
+            pad_along_width = max(fw - sw, 0)
+        else:
+            pad_along_width = max(fw - (w_in % sw), 0)
+
         # Cleaning padding input.
+        # if self.padding == "SAME":
+        #     ph = (fh - 1) // 2
+        #     pw = (fw - 1) // 2
+        # elif self.padding == "VALID":
+        #     ph, pw = 0, 0
+        # else:
+        #     raise AssertionError(f"Illegal padding type {self.padding}")
+
         if self.padding == "SAME":
-            ph = (fh - 1) // 2
-            pw = (fw - 1) // 2
+            ph_top = pad_along_height // 2
+            ph_bottom = pad_along_height - ph_top
+            pw_left = pad_along_width // 2
+            pw_right = pad_along_width - pw_left
         elif self.padding == "VALID":
-            ph, pw = 0, 0
+            ph_top = 0
+            ph_bottom = 0
+            pw_left = 0
+            pw_right = 0
         else:
             raise AssertionError(f"Illegal padding type {self.padding}")
 
@@ -46,26 +68,37 @@ class Conv2D(layers_keras.Conv2D):
         ## Iterate and apply convolution operator to each image
 
         ## PLEASE RETURN A TENSOR using tf.convert_to_tensor(your_array, dtype=tf.float32)
-        h_in += 2*ph
-        w_in += 2*pw
+        # h_in += 2*ph
+        # w_in += 2*pw
         # output_height = (h_in - fh)//sh+1
         # output_width = (w_in - fw)//sw+1
         # outputs_shape = (bn, output_height, output_width, c_out)
+
         if self.padding == "VALID":
-            output_height = (h_in - fh)//sh+1
-            output_width = (w_in - fw)//sw+1
-            outputs_shape = (bn, int(output_height), int(output_width), c_out)
+            output_height = math.ceil((h_in - fh + 1)/sh)
+            output_width = math.ceil((w_in - fw + 1)/sw)
+            outputs_shape = (bn, output_height, output_width, c_out)       
 
         if self.padding == "SAME":
             output_height = math.ceil(h_in/sh)
             output_width = math.ceil(w_in/sw)
             outputs_shape = (bn, int(output_height), int(output_width), c_out)
-            paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
+            paddings = tf.constant([[0, 0], [ph_top, ph_bottom], [pw_left, pw_right], [0, 0]])
             inputs = tf.pad(inputs, paddings, "CONSTANT")
+        
+        h_in += (ph_top+ph_bottom)
+        w_in += (pw_left+pw_right)
 
         # if self.padding == "SAME":
         #     paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
         #     inputs = tf.pad(inputs, paddings, "CONSTANT")
+
+        print(outputs_shape)
+        print(inputs.shape)
+        print(c_out)
+        print(c_in)
+        print(output_height)
+        print(output_width)
 
         outputs = np.zeros(outputs_shape)
         for b in range(bn):
@@ -80,6 +113,6 @@ class Conv2D(layers_keras.Conv2D):
                             result += tf.reduce_sum(inputs_sliced*kernel_flat)
                         outputs[b, h, w, k] = result
                     
-        outputs = tf.convert_to_tensor(outputs, dtype=tf.float32)
+        outputs = tf.convert_to_tensor(outputs + self.bias, dtype=tf.float32)
         
-        return outputs + self.bias
+        return outputs
