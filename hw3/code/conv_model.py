@@ -56,7 +56,7 @@ def get_default_CNN_model(
         BatchNormalization(dtype = 'float32'), 
         Conv2D(64, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
         BatchNormalization(dtype = 'float32'), 
-        Conv2D(128, (3,3), activation='softmax', padding='same', dtype = 'float32'),
+        Conv2D(128, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
         tf.keras.layers.MaxPool2D((2,2), 2),
         BatchNormalization(dtype = 'float32'), 
         tf.keras.layers.Flatten(),
