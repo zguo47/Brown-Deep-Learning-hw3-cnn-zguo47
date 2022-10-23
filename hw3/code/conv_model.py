@@ -74,7 +74,7 @@ def get_default_CNN_model(
 
     ## TODO 3: Compile your model using your choice of optimizer
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(0.00005),  ## feel free to change
+        optimizer=tf.keras.optimizers.Adam(0.001),  ## feel free to change
         loss="categorical_crossentropy",  ## do not change loss/metrics
         metrics=["categorical_accuracy"],
     )
