@@ -81,7 +81,7 @@ def get_default_CNN_model(
 
     ## TODO 4: Pick an appropriate number of epochs and batch size to use for training
     ## your model. Note that the autograder will time out after 10 minutes.
-    return SimpleNamespace(model=model, epochs=25, batch_size=250)
+    return SimpleNamespace(model=model, epochs=30, batch_size=250)
 
 
 ###############################################################################################
