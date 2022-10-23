@@ -56,7 +56,7 @@ def get_default_CNN_model(
         BatchNormalization(dtype = 'float32'), 
         Conv2D(64, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
         BatchNormalization(dtype = 'float32'), 
-        Conv2D(128, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
+        Conv2D(128, (3,3), activation='softmax', padding='same', dtype = 'float32'),
         tf.keras.layers.MaxPool2D((2,2), 2),
         BatchNormalization(dtype = 'float32'), 
         tf.keras.layers.Flatten(),
@@ -74,7 +74,7 @@ def get_default_CNN_model(
 
     ## TODO 3: Compile your model using your choice of optimizer
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(0.0008),  ## feel free to change
+        optimizer=tf.keras.optimizers.Adam(0.0005),  ## feel free to change
         loss="categorical_crossentropy",  ## do not change loss/metrics
         metrics=["categorical_accuracy"],
     )

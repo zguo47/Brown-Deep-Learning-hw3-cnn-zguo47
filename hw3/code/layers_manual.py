@@ -36,13 +36,13 @@ class Conv2D(layers_keras.Conv2D):
             pad_along_width = max(fw - (w_in % sw), 0)
 
         # Cleaning padding input.
-        if self.padding == "SAME":
-            ph = (fh - 1) // 2
-            pw = (fw - 1) // 2
-        elif self.padding == "VALID":
-            ph, pw = 0, 0
-        else:
-            raise AssertionError(f"Illegal padding type {self.padding}")
+        # if self.padding == "SAME":
+        #     ph = (fh - 1) // 2
+        #     pw = (fw - 1) // 2
+        # elif self.padding == "VALID":
+        #     ph, pw = 0, 0
+        # else:
+        #     raise AssertionError(f"Illegal padding type {self.padding}")
 
         if self.padding == "SAME":
             ph_top = pad_along_height // 2
@@ -68,11 +68,6 @@ class Conv2D(layers_keras.Conv2D):
         ## Iterate and apply convolution operator to each image
 
         ## PLEASE RETURN A TENSOR using tf.convert_to_tensor(your_array, dtype=tf.float32)
-        # h_in += 2*ph
-        # w_in += 2*pw
-        # output_height = (h_in - fh)//sh+1
-        # output_width = (w_in - fw)//sw+1
-        # outputs_shape = (bn, output_height, output_width, c_out)
 
         if self.padding == "VALID":
             output_height = math.ceil((h_in - fh + 1)/sh)
@@ -88,10 +83,6 @@ class Conv2D(layers_keras.Conv2D):
         
         h_in += (ph_top+ph_bottom)
         w_in += (pw_left+pw_right)
-
-        # if self.padding == "SAME":
-        #     paddings = tf.constant([[0, 0], [ph, ph], [pw, pw], [0, 0]])
-        #     inputs = tf.pad(inputs, paddings, "CONSTANT")
 
         outputs = np.zeros(outputs_shape)
         for b in range(bn):
