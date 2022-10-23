@@ -41,8 +41,7 @@ def get_default_CNN_model(
 
     ## TODO 1: Augment the input data (feel free to experiment)
     ## https://www.tensorflow.org/guide/keras/preprocessing_layers
-    augment_fn = tf.keras.Sequential([tf.keras.layers.RandomFlip(),
-    tf.keras.layers.RandomRotation(0.1)])
+    augment_fn = tf.keras.Sequential([tf.keras.layers.RandomFlip()])
 
     ## TODO 2: Make sure your first Conv2D is Conv2D_manual (after you've
     ## implemented it), has stride 2, 2, and goes up to low channel count
@@ -55,6 +54,7 @@ def get_default_CNN_model(
         tf.keras.layers.MaxPool2D((2,2), 2),
         BatchNormalization(dtype = 'float32'), 
         Conv2D(64, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
+        tf.keras.layers.MaxPool2D((2,2), 2),
         BatchNormalization(dtype = 'float32'), 
         Conv2D(128, (3,3), activation='leaky_relu', padding='same', dtype = 'float32'),
         tf.keras.layers.MaxPool2D((2,2), 2),
