@@ -74,14 +74,14 @@ def get_default_CNN_model(
 
     ## TODO 3: Compile your model using your choice of optimizer
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(0.001),  ## feel free to change
+        optimizer=tf.keras.optimizers.Adam(0.0005),  ## feel free to change
         loss="categorical_crossentropy",  ## do not change loss/metrics
         metrics=["categorical_accuracy"],
     )
 
     ## TODO 4: Pick an appropriate number of epochs and batch size to use for training
     ## your model. Note that the autograder will time out after 10 minutes.
-    return SimpleNamespace(model=model, epochs=30, batch_size=250)
+    return SimpleNamespace(model=model, epochs=20, batch_size=300)
 
 
 ###############################################################################################
